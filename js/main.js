@@ -1,6 +1,3 @@
-// main.js
-
-// Массив случайных предложений для комментариев
 const messages = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -10,7 +7,6 @@ const messages = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-// Массив случайных имен для комментаторов
 const names = [
   'Артём',
   'Мария',
@@ -29,7 +25,6 @@ const names = [
   'Андрей'
 ];
 
-// Массив описаний для фотографий
 const descriptions = [
   'Прекрасный закат на море',
   'Горный пейзаж в утреннем тумане',
@@ -58,90 +53,77 @@ const descriptions = [
   'Уличное искусство и граффити'
 ];
 
-// Функция для генерации случайного числа в заданном диапазоне
-function getRandomInteger(minimum, maximum) {
-  const lowerBound = Math.ceil(Math.min(minimum, maximum));
-  const upperBound = Math.floor(Math.max(minimum, maximum));
-  return Math.floor(lowerBound + Math.random() * (upperBound - lowerBound + 1));
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Функция для получения случайного элемента из массива
-function getRandomArrayElement(array) {
-  const randomIndex = getRandomInteger(0, array.length - 1);
-  return array[randomIndex];
-}
-
-// Функция для создания генератора уникальных идентификаторов
-// Теперь гарантирует уникальность в большом диапазоне, а не просто последовательность.
-function createUniqueIdGenerator(minId, maxId) {
-  const generatedIds = new Set();
-  return function() {
-    let id = getRandomInteger(minId, maxId);
-    while (generatedIds.has(id)) {
-      id = getRandomInteger(minId, maxId);
-    }
-    generatedIds.add(id);
-    return id;
-  };
-}
-
-// Создаем генератор идентификаторов для комментариев с большим диапазоном
-const generateCommentId = createUniqueIdGenerator(1, 10000); // Например, от 1 до 10000
-
-// Функция для создания одного комментария
-function createComment() {
-  const numberOfSentences = getRandomInteger(1, 2); // От 1 до 2 предложений
-  const commentMessages = [];
-
-  // Выбираем уникальные предложения для комментария
-  while (commentMessages.length < numberOfSentences) {
-    const randomMessage = getRandomArrayElement(messages);
-    if (!commentMessages.includes(randomMessage)) { // Проверяем на уникальность
-      commentMessages.push(randomMessage);
+function getUniqueNumbers(count, min, max) {
+  const numbers = [];
+  while (numbers.length < count) {
+    const num = getRandomInt(min, max);
+    if (!numbers.includes(num)) {
+      numbers.push(num);
     }
   }
+  return numbers;
+}
 
-  const comment = {
-    id: generateCommentId(),
-    avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`, // Используем шаблонные строки
-    message: commentMessages.join(' '), // Объединяем предложения
-    name: getRandomArrayElement(names)
+const usedCommentIds = new Set();
+function getUniqueCommentId() {
+  let candidate = getRandomInt(1, 10000);
+  while (usedCommentIds.has(candidate)) {
+    candidate = getRandomInt(1, 10000);
+  }
+  usedCommentIds.add(candidate);
+  return candidate;
+}
+
+function getRandomMessage() {
+  const count = getRandomInt(1, 2);
+  let chosen = [];
+  while (chosen.length < count) {
+    const index = getRandomInt(0, messages.length - 1);
+    if (!chosen.includes(messages[index])) {
+      chosen.push(messages[index]);
+    }
+  }
+  return chosen.join(' ');
+}
+
+function generateComment() {
+  return {
+    id: getUniqueCommentId(),
+    avatar: `img/avatar-${getRandomInt(1, 6)}.svg`,
+    message: getRandomMessage(),
+    name: names[getRandomInt(0, names.length - 1)]
   };
-  return comment;
 }
 
-// Функция для создания массива комментариев
-function createComments() {
-  const commentsCount = getRandomInteger(0, 30);
-  // Используем Array.from для более чистого создания массива
-  const commentsArray = Array.from({ length: commentsCount }, createComment);
-  return commentsArray;
-}
+function generatePhotos(num = 25) {
+  const photoIds = getUniqueNumbers(num, 1, 25);
+  const urls = [...photoIds];
+  const photos = [];
 
-// Функция для создания объекта фотографии
-function createPhoto(index) {
-  const photo = {
-    id: index,
-    url: `photos/${index}.jpg`, // Используем шаблонные строки
-    description: getRandomArrayElement(descriptions), // Случайное описание
-    likes: getRandomInteger(15, 200),
-    comments: createComments()
-  };
+  for (let i = 0; i < num; i++) {
 
-  return photo;
-}
+    const description = descriptions[i % descriptions.length];
 
-// Функция для генерации массива из 25 фотографий
-function generatePhotos() {
-  const photosArray = [];
+    const likes = getRandomInt(15, 200);
 
-  for (let i = 1; i <= 25; i++) {
-    const newPhoto = createPhoto(i);
-    photosArray.push(newPhoto);
+    const commentsCount = getRandomInt(0, 30);
+
+    const comments = Array.from({ length: commentsCount }, generateComment);
+
+    photos.push({
+      id: photoIds[i],
+      url: `photos/${i + 1}.jpg`,
+      description,
+      likes,
+      comments
+    });
   }
 
-  return photosArray;
+  return photos;
 }
 
-// Создание массива фотографий
-const photos = generatePhotos();
+const photosArray = generatePhotos(25);
