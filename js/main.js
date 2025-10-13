@@ -113,7 +113,7 @@ function generatePhotos(num = 25) {
 
     photos.push({
       id: photoIds[i],
-      url: `photos/${photoIds[i]}.jpg`,
+      url: `photos/${i + 1}.jpg`,
       description,
       likes,
       comments
