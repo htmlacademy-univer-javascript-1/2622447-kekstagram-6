@@ -109,4 +109,4 @@ function generatePhotos(num = 25) {
   return photos;
 }
 
-const photosArray = generatePhotos(25);
+generatePhotos(25);
