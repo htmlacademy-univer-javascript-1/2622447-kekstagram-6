@@ -68,7 +68,7 @@ function getUniqueCommentId() {
 
 function getRandomMessage() {
   const count = getRandomInt(1, 2);
-  let chosen = [];
+  const chosen = [];
   while (chosen.length < count) {
     const index = getRandomInt(0, commentMessages.length - 1);
     if (!chosen.includes(commentMessages[index])) {
@@ -89,7 +89,6 @@ function generateComment() {
 
 function generatePhotos(num = 25) {
   const photoIds = getUniqueNumbers(num, 1, 25);
-  const urls = [...photoIds];
   const photos = [];
 
   for (let i = 0; i < num; i++) {
